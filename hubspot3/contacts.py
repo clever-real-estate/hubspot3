@@ -268,3 +268,17 @@ class ContactsClient(BaseClient):
             DeprecationWarning,
         )
         return self.delete_by_id(contact_id, **options)
+
+    # TODO: finish implementing with all optional inputs
+    def search_for_hubspot_contacts(self, query: str, **options):
+        """
+        Implementation of this HubSpot API endpoint: https://developers.hubspot.com/docs/methods/contacts/search_contacts
+        Returns an array of HubSpot Contact JSON Objects or an empty array.
+        """
+        output = []
+        batch = self._call(
+            "contacts/v1/search/query", method="POST", query=query, **options
+        )
+        output.extend([contact for contact in batch["contacts"]])
+        return output
+

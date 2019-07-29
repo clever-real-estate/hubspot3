@@ -47,6 +47,7 @@ class DealsClient(BaseClient):
         return self._call("deal/{}".format(deal_id), data=data, method="PUT", **options)
 
     def associate(self, deal_id, object_type, object_ids, **options):
+        # TODO: DEPRECATE
         # Encoding the query string here since HubSpot is expecting the "id" parameter to be
         # repeated for each object ID, which is not a standard practice and won't work otherwise.
         object_ids = [("id", object_id) for object_id in object_ids]
