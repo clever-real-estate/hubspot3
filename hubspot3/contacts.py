@@ -112,7 +112,8 @@ class ContactsClient(BaseClient):
         """
         output = []
         if query[:2].startswith("q="):
-            query = urllib.parse.urlencode(query[2:])
+            query = query[2:]
+        query = urllib.parse.quote(query)
         batch = self._call(
             "contacts/v1/search/query?q={query}".format(query=query),
             method="GET",
