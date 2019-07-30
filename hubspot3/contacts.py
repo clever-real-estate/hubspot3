@@ -41,6 +41,14 @@ class ContactsClient(BaseClient):
             "contact/email/{email}/profile".format(email=email), method="GET", **options
         )
 
+    def get_by_hutk(self, hutk, **options):
+         """Get contact specified by hutk."""
+        return self._call(
+            "contacts/v1/contact/utk/{hutk}/profile".format(hutk=hutk),
+            method="GET",
+            **options
+        )
+
     def create(self, data=None, **options):
         """create a contact"""
         data = data or {}
@@ -95,6 +103,19 @@ class ContactsClient(BaseClient):
             method="POST",
             **options
         )
+
+    # TODO: finish implementing with all optional inputs
+    def search_for_hubspot_contacts(self, query: str, **options):
+        """
+        Implementation of this HubSpot API endpoint: https://developers.hubspot.com/docs/methods/contacts/search_contacts
+        Returns an array of HubSpot Contact JSON Objects or an empty array.
+        """
+        output = []
+        batch = self._call(
+            "contacts/v1/search/query", method="POST", query=query, **options
+        )
+        output.extend([contact for contact in batch["contacts"]])
+        return output
 
     default_batch_properties = [
         "email",
@@ -268,17 +289,4 @@ class ContactsClient(BaseClient):
             DeprecationWarning,
         )
         return self.delete_by_id(contact_id, **options)
-
-    # TODO: finish implementing with all optional inputs
-    def search_for_hubspot_contacts(self, query: str, **options):
-        """
-        Implementation of this HubSpot API endpoint: https://developers.hubspot.com/docs/methods/contacts/search_contacts
-        Returns an array of HubSpot Contact JSON Objects or an empty array.
-        """
-        output = []
-        batch = self._call(
-            "contacts/v1/search/query", method="POST", query=query, **options
-        )
-        output.extend([contact for contact in batch["contacts"]])
-        return output
 
