@@ -43,11 +43,7 @@ class ContactsClient(BaseClient):
 
     def get_by_hutk(self, hutk, **options):
          """Get contact specified by hutk."""
-        return self._call(
-            "contacts/v1/contact/utk/{hutk}/profile".format(hutk=hutk),
-            method="GET",
-            **options
-        )
+        return self._call("contacts/v1/contact/utk/{hutk}/profile".format(hutk=hutk),**options)
 
     def create(self, data=None, **options):
         """create a contact"""
