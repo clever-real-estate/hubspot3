@@ -47,7 +47,7 @@ class BaseClient(object):
         api_base: str = "api.hubapi.com",
         debug: bool = False,
         disable_auth: bool = False,
-        **extra_options
+        **extra_options,
     ) -> None:
         super(BaseClient, self).__init__()
         # reverse so that the first one in the list because the first parent
@@ -107,11 +107,12 @@ class BaseClient(object):
             query = ""
         if query and query.startswith("?"):
             query = query[1:]
-        if query and not query.startswith("&"):
-            query = "&" + query
+        if query and not query.endswith("&"):
+            query += "&"
         url = opts.get("url") or "/{}?{}{}".format(
-            self._get_path(subpath), urllib.parse.urlencode(params, doseq), query
+            self._get_path(subpath), query, urllib.parse.urlencode(params, doseq)
         )
+        print(f"url: {url}")
         headers = opts.get("headers") or {}
         headers.update(
             {
@@ -207,7 +208,7 @@ class BaseClient(object):
         doseq=False,
         query="",
         retried=False,
-        **options
+        **options,
     ):
         opts = self.options.copy()
         opts.update(options)
@@ -296,7 +297,7 @@ class BaseClient(object):
                         doseq=doseq,
                         query=query,
                         retried=True,
-                        **options
+                        **options,
                     )
                 elif self.access_token:
                     self.log.warning(
@@ -330,7 +331,7 @@ class BaseClient(object):
         doseq: bool = False,
         query: str = "",
         raw: bool = False,
-        **options
+        **options,
     ):
         result = self._call_raw(
             subpath,
@@ -340,6 +341,6 @@ class BaseClient(object):
             doseq=doseq,
             query=query,
             retried=False,
-            **options
+            **options,
         )
         return result if raw else self._digest_result(result.body)

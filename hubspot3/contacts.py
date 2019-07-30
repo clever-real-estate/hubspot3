@@ -109,12 +109,8 @@ class ContactsClient(BaseClient):
         Returns an array of HubSpot Contact JSON Objects or an empty array.
         """
         output = []
-        if query[:2].startswith("q="):
-            query = query[2:]
-        query = urllib.parse.quote(query)
-        batch = self._call(
-            "search/query?q={query}".format(query=query), method="GET", **options
-        )
+        query = "q=" + urllib.parse.quote(query)
+        batch = self._call("search/query", method="GET", query=query, **options)
         output.extend([contact for contact in batch["contacts"]])
         return output
 
