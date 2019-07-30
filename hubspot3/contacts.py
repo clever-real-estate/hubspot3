@@ -42,8 +42,12 @@ class ContactsClient(BaseClient):
         )
 
     def get_by_hutk(self, hutk, **options):
-         """Get contact specified by hutk."""
-        return self._call("contacts/v1/contact/utk/{hutk}/profile".format(hutk=hutk),**options)
+        """Get contact specified by hutk."""
+        return self._call(
+            "contacts/v1/contact/utk/{hutk}/profile".format(hutk=hutk),
+            method="GET",
+            **options
+        )
 
     def create(self, data=None, **options):
         """create a contact"""
@@ -238,7 +242,7 @@ class ContactsClient(BaseClient):
         :see: https://developers.hubspot.com/docs/methods/contacts/get_recently_updated_contacts
         """
         return self._get_recent(ContactsClient.Recency.MODIFIED, limit=limit)
-    
+
     def get_all_properties(self, **options):
         return self._call("properties/v1/contacts/properties", method="GET", **options)
 
