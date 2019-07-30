@@ -219,6 +219,3 @@ class DealsClient(BaseClient):
             **options
         )
 
-    def get_all_properties(self, **options):
-        return self._call("properties/v1/deals/properties/", method="GET", **options)
-
