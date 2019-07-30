@@ -2,6 +2,7 @@
 hubspot contacts api
 """
 import warnings
+import urllib.parse
 from typing import Union
 from hubspot3.base import BaseClient
 from hubspot3.utils import prettify, get_log
@@ -111,7 +112,7 @@ class ContactsClient(BaseClient):
         """
         output = []
         if query[:2].startswith("q="):
-            query = query[2:]
+            query = urllib.parse.urlencode(query[2:])
         batch = self._call(
             "contacts/v1/search/query?q={query}".format(query=query),
             method="GET",
