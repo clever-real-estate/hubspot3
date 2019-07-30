@@ -243,7 +243,7 @@ class ContactsClient(BaseClient):
         """
         return self._get_recent(ContactsClient.Recency.MODIFIED, limit=limit)
     
-    def get_all_contact_properties(self, **options):
+    def get_all_properties(self, **options):
         return self._call("properties/v1/contacts/properties", method="GET", **options)
 
     def get_contact_by_id(self, contact_id: str, **options):
