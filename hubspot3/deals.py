@@ -218,3 +218,7 @@ class DealsClient(BaseClient):
             include_versions=include_versions,
             **options
         )
+
+    def get_all_deal_properties(self, **options):
+        return self._call("properties/v1/deals/properties/", method="GET", **options)
+

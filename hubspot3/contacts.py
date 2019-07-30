@@ -104,7 +104,7 @@ class ContactsClient(BaseClient):
             **options
         )
 
-    def search_for_hubspot_contacts(self, query: str, **options):
+    def search_for_contacts(self, query: str, **options):
         """
         Implementation of this HubSpot API endpoint: https://developers.hubspot.com/docs/methods/contacts/search_contacts
         Returns an array of HubSpot Contact JSON Objects or an empty array.
@@ -113,7 +113,7 @@ class ContactsClient(BaseClient):
         if query[:2] != "q=":
             query = "q=" + query
         batch = self._call(
-            "contacts/v1/search/query", method="POST", query=query, **options
+            "contacts/v1/search/query", method="GET", query=query, **options
         )
         output.extend([contact for contact in batch["contacts"]])
         return output
@@ -242,6 +242,9 @@ class ContactsClient(BaseClient):
         :see: https://developers.hubspot.com/docs/methods/contacts/get_recently_updated_contacts
         """
         return self._get_recent(ContactsClient.Recency.MODIFIED, limit=limit)
+    
+    def get_all_contact_properties(self, **options):
+        return self._call("properties/v1/contacts/properties", method="GET", **options)
 
     def get_contact_by_id(self, contact_id: str, **options):
         warnings.warn(
