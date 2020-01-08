@@ -18,10 +18,10 @@ class Hubspot3UsageLimits:
 
     def __init__(
         self,
-        collected_at: datetime = datetime.fromtimestamp(0),
+        collected_at: datetime = datetime.now(),
         current_usage: int = 0,
         fetch_status: str = FetchStatus.NONE,
-        resets_at: datetime = datetime.fromtimestamp(0),
+        resets_at: datetime = datetime.now(),
         usage_limit: int = 0,
     ) -> None:
         """usage limits constructor"""
@@ -75,7 +75,10 @@ class Hubspot3UsageLimits:
         :see: https://developers.hubspot.com/docs/methods/check-daily-api-usage
         """
         five_minutes_ago = datetime.now() - timedelta(minutes=5)
-        if self.collected_at and self.collected_at > five_minutes_ago:
+        if (
+            self.fetch_status != self.FetchStatus.NONE
+            and self.collected_at > five_minutes_ago
+        ):
             return False
         return True
 
@@ -182,6 +185,13 @@ class Hubspot3:
         return CompaniesClient(**self.auth, **self.options)
 
     @property
+    def companies_properties(self):
+        """returns a hubspot3 companies properties client"""
+        from hubspot3.companies_properties import CompaniesPropertiesClient
+
+        return CompaniesPropertiesClient(**self.auth, **self.options)
+
+    @property
     def contact_lists(self):
         """returns a hubspot3 contact_lists client"""
         from hubspot3.contact_lists import ContactListsClient
@@ -224,6 +234,20 @@ class Hubspot3:
         return EcommerceBridgeClient(**self.auth, **self.options)
 
     @property
+    def email_events(self):
+        """returns a hubspot3 email events client"""
+        from hubspot3.email_events import EmailEventsClient
+
+        return EmailEventsClient(**self.auth, **self.options)
+
+    @property
+    def email_subscription(self):
+        """returns a hubspot3 email subscription client"""
+        from hubspot3.email_subscription import EmailSubscriptionClient
+
+        return EmailSubscriptionClient(**self.auth, **self.options)
+
+    @property
     def engagements(self):
         """returns a hubspot3 engagements client"""
         from hubspot3.engagements import EngagementsClient
@@ -259,6 +283,13 @@ class Hubspot3:
         return LeadsClient(**self.auth, **self.options)
 
     @property
+    def lines(self):
+        """returns a hubspot3 lines client"""
+        from hubspot3.lines import LinesClient
+
+        return LinesClient(**self.auth, **self.options)
+
+    @property
     def oauth2(self):
         """returns a hubspot3 OAuth2 client"""
         from hubspot3.oauth2 import OAuth2Client
@@ -278,6 +309,20 @@ class Hubspot3:
         from hubspot3.products import ProductsClient
 
         return ProductsClient(**self.auth, **self.options)
+
+    @property
+    def properties(self):
+        """returns a hubspot3 deal properties client"""
+        from hubspot3.properties import PropertiesClient
+
+        return PropertiesClient(**self.auth, **self.options)
+
+    @property
+    def property_groups(self):
+        """returns a hubspot3 property_groups client"""
+        from hubspot3.property_groups import PropertyGroupsClient
+
+        return PropertyGroupsClient(**self.auth, **self.options)
 
     @property
     def prospects(self):
@@ -301,8 +346,15 @@ class Hubspot3:
         return TicketsClient(**self.auth, **self.options)
 
     @property
+    def workflows(self):
+        """returns a hubspot3 workflows client"""
+        from hubspot3.workflows import WorkflowsClient
+
+        return WorkflowsClient(**self.auth, **self.options)
+
+    @property
     def usage_limits(self):
-        """fetches and returns a nice usage liimitation object"""
+        """fetches and returns a nice usage limitation object"""
         if self._usage_limits.need_update:
             limits = self._base._call("integrations/v1/limit/daily")[0]
             self._usage_limits = Hubspot3UsageLimits(
@@ -315,7 +367,7 @@ class Hubspot3:
         return self._usage_limits
 
     @property
-    def me(self):
+    def me(self):  # pylint: disable=invalid-name
         """
         returns info about your hubspot account
         :see: https://developers.hubspot.com/docs/methods/get-account-details
