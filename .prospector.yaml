@@ -32,7 +32,7 @@ pylint:
 
   options:
     max-args: 12
-    max-locals: 140
+    max-locals: 100
     max-returns: 6
     max-branches: 50
     max-statements: 180
@@ -41,7 +41,7 @@ pylint:
     min-public-methods: 0
     max-public-methods: 40
     max-module-lines: 2000
-    max-line-length: 140
+    max-line-length: 100
 
 mccabe:
   options:

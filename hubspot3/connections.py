@@ -82,7 +82,10 @@ class ConnectionsClient(BaseClient):
         """
 
         return self._call(
-            f"objects/p3298701_connection/{connection_vid}/associations/{object_type}/{vid}/connection_to_{object_type}",
+            (
+                f"objects/p3298701_connection/{connection_vid}/associations/"
+                f"{object_type}/{vid}/connection_to_{object_type}"
+            ),
             method="PUT",
             **options,
         )
@@ -102,7 +105,10 @@ class ConnectionsClient(BaseClient):
         """
 
         return self._call(
-            f"objects/p3298701_connection/{connection_vid}/associations/{object_type}/{vid}/connection_to_{object_type}",
+            (
+                f"objects/p3298701_connection/{connection_vid}/associations/"
+                f"{object_type}/{vid}/connection_to_{object_type}"
+            ),
             method="DELETE",
             **options,
         )

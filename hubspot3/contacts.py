@@ -80,7 +80,8 @@ class ContactsClient(BaseClient):
 
     def search_for_contacts(self, query: str, **options):
         """
-        Implementation of this HubSpot API endpoint: https://developers.hubspot.com/docs/methods/contacts/search_contacts
+        Implementation of this HubSpot API endpoint:
+        https://developers.hubspot.com/docs/methods/contacts/search_contacts
         Returns an array of HubSpot Contact JSON Objects or an empty array.
         """
         output = []
