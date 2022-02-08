@@ -11,6 +11,7 @@ from hubspot3.utils import get_log, prettify
 
 CONTACTS_API_VERSION = "1"
 
+
 class ConnectionsClient(BaseClient):
     """
     Lets you extend to non-existing clients, this example extends pipelines
@@ -20,17 +21,15 @@ class ConnectionsClient(BaseClient):
         """initialize a connections client"""
         super(ConnectionsClient, self).__init__(*args, **kwargs)
         self.log = get_log("hubspot3.connections")
-   
+
     def create(
         self,
         payload: dict,
         **options,
     ):
         """
-        create a hubspot association
-        :param from_object: ID of object to relate
-        :param to_object: ID of object to relate to
-        :param definition: Definition ID for the objects you're looking for associations of
+        create a hubspot connection
+        :param payload: Dict A connection dict
         """
 
         return self._call(
@@ -46,10 +45,8 @@ class ConnectionsClient(BaseClient):
         **options,
     ):
         """
-        create a hubspot association
-        :param from_object: ID of object to relate
-        :param to_object: ID of object to relate to
-        :param definition: Definition ID for the objects you're looking for associations of
+        delete a hubspot connection
+        :param connection_vid: Integer ID of connection in hubspot
         """
 
         return self._call(
@@ -65,10 +62,9 @@ class ConnectionsClient(BaseClient):
         **options,
     ):
         """
-        create a hubspot association
-        :param from_object: ID of object to relate
-        :param to_object: ID of object to relate to
-        :param definition: Definition ID for the objects you're looking for associations of
+        update a hubspot connection
+        :param connection_vid: Integer ID of connection in hubspot
+        :param payload: Dict A connection dict
         """
 
         return self._call(
@@ -86,10 +82,10 @@ class ConnectionsClient(BaseClient):
         **options,
     ):
         """
-        create a hubspot association
-        :param from_object: ID of object to relate
-        :param to_object: ID of object to relate to
-        :param definition: Definition ID for the objects you're looking for associations of
+        create a hubspot connection association
+        :param connection_vid: Integer ID of connection in hubspot
+        :param vid: Integer ID of associated object in hubspot
+        :param object_type: String Type of object to be associated
         """
 
         return self._call(
@@ -106,10 +102,10 @@ class ConnectionsClient(BaseClient):
         **options,
     ):
         """
-        create a hubspot association
-        :param from_object: ID of object to relate
-        :param to_object: ID of object to relate to
-        :param definition: Definition ID for the objects you're looking for associations of
+        remove a hubspot connection association
+        :param connection_vid: Integer ID of connection in hubspot
+        :param vid: Integer ID of associated object in hubspot
+        :param object_type: String Type of object to be associated
         """
 
         return self._call(
