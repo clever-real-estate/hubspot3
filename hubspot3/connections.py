@@ -1,15 +1,8 @@
 """
-hubspot contacts api
+hubspot connections api
 """
-import urllib.parse
-import warnings
-from typing import Dict, List, Union
-
 from hubspot3.base import BaseClient
-from hubspot3.crm_associations import CRMAssociationsClient
-from hubspot3.utils import get_log, prettify
-
-CONTACTS_API_VERSION = "1"
+from hubspot3.utils import get_log
 
 
 class ConnectionsClient(BaseClient):
