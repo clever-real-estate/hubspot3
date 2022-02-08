@@ -26,7 +26,7 @@ class ConnectionsClient(BaseClient):
         """
 
         return self._call(
-            f"objects/p3298701_connection",
+            "objects/p3298701_connection",
             method="POST",
             data=payload,
             **options,
