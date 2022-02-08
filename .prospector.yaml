@@ -17,6 +17,7 @@ pylint:
     - import-error
     - import-self
     - logging-format-interpolation
+    - logging-fstring-interpolation
     - missing-docstring
     - no-self-use
     - unused-argument
@@ -25,6 +26,9 @@ pylint:
     - cyclic-import
     - import-outside-toplevel
     - unnecessary-comprehension
+    - unsubscriptable-object
+    # TODO the two below should be removed after some time
+    - super-with-arguments
 
   options:
     max-args: 12
@@ -50,6 +54,7 @@ pep8:
     - N807
     - N813
     - W503
+    - N818
   options:
     max-line-length: 100
     single-line-if-stmt: n

@@ -6,14 +6,13 @@ import json
 import logging
 import time
 import traceback
-import urllib.request
-import urllib.parse
 import urllib.error
+import urllib.parse
+import urllib.request
 import zlib
 from typing import Callable, List, Optional, Union
-from typing_extensions import Literal
+
 from hubspot3 import utils
-from hubspot3.utils import force_utf8
 from hubspot3.error import (
     HubspotBadConfig,
     HubspotBadRequest,
@@ -26,6 +25,12 @@ from hubspot3.error import (
     HubspotTimeout,
     HubspotUnauthorized,
 )
+from hubspot3.utils import force_utf8, uglify_hapikey
+
+try:
+    from typing import Literal  # type: ignore
+except ImportError:
+    from typing_extensions import Literal  # type: ignore
 
 
 class BaseClient:
@@ -181,10 +186,11 @@ class BaseClient:
             query = ""
         if query and query.startswith("?"):
             query = query[1:]
-        if query and not query.endswith("&"):
-            query += "&"
-        url = opts.get("url") or "/{}?{}{}".format(
-            self._get_path(subpath), query, urllib.parse.urlencode(params, doseq)
+        if query and not query.startswith("&"):
+            query = "&" + query
+        url = (
+            opts.get("url")
+            or f"/{self._get_path(subpath)}?{urllib.parse.urlencode(params, doseq)}{query}"
         )
         print(f"url: {url}")
         headers = opts.get("headers") or {}
@@ -195,13 +201,13 @@ class BaseClient:
             }
         )
         if self.access_token:
-            headers.update({"Authorization": "Bearer {}".format(self.access_token)})
+            headers.update({"Authorization": f"Bearer {self.access_token}"})
 
         if data and headers["Content-Type"] == "application/json" and not retried:
             data = json.dumps(data)
 
         for hs_property in properties:
-            url += "&properties={}".format(hs_property)
+            url += f"&properties={hs_property}"
 
         return url, headers, data
 
@@ -228,8 +234,8 @@ class BaseClient:
     def _execute_request_raw(self, conn, request):
         try:
             result = conn.getresponse()
-        except Exception:
-            raise HubspotTimeout(None, request, traceback.format_exc())
+        except Exception as exception:
+            raise HubspotTimeout(None, request, traceback.format_exc()) from exception
 
         encoding = [i[1] for i in result.getheaders() if i[0] == "content-encoding"]
         possibly_encoded = result.read()
@@ -320,8 +326,7 @@ class BaseClient:
         # Never retry a POST, PUT, or DELETE unless explicitly told to
         if method != "GET" and not opts.get("retry_on_post"):
             num_retries = 0
-        if num_retries > 6:
-            num_retries = 6
+        num_retries = min(num_retries, 6)
 
         emergency_brake = 10
         try_count = 0
@@ -339,7 +344,7 @@ class BaseClient:
                 result = self._execute_request_raw(connection, request_info)
                 break
             except HubspotUnauthorized:
-                self.log.warning("401 Unauthorized response to API request.")
+                self.log.debug("401 Unauthorized response to API request.")
                 if (
                     self.access_token
                     and self.refresh_token
@@ -355,7 +360,7 @@ class BaseClient:
 
                     from hubspot3.oauth2 import OAuth2Client
 
-                    self.log.info("Refreshing access token")
+                    self.log.debug("Refreshing access token")
                     try:
                         client = OAuth2Client(**self.options)
                         refresh_result = client.refresh_tokens(
@@ -365,13 +370,9 @@ class BaseClient:
                         )
                         self.access_token = refresh_result["access_token"]
                         self.refresh_token = refresh_result["refresh_token"]
-                        self.log.info(
-                            "Retrying with new token {}".format(self.access_token)
-                        )
+                        self.log.debug("Retrying with new token")
                     except Exception as exception:
-                        self.log.error(
-                            "Unable to refresh access_token: {}".format(exception)
-                        )
+                        self.log.error(f"Unable to refresh access_token: {exception}")
                         raise
                     return self._call_raw(
                         subpath,
@@ -392,14 +393,14 @@ class BaseClient:
                 raise
             except HubspotError as exception:
                 if try_count > num_retries:
-                    logging.warning("Too many retries for {}".format(url))
+                    logging.warning(f"Too many retries for {uglify_hapikey(url)}")
                     raise
                 # Don't retry errors from 300 to 499
                 if exception.result and 300 <= exception.result.status < 500:
                     raise
                 self._prepare_request_retry(method, url, headers, data)
                 self.log.warning(
-                    "HubspotError {} calling {}, retrying".format(exception, url)
+                    f"HubspotError {exception} calling {uglify_hapikey(url)}, retrying"
                 )
             # exponential back off
             # wait 0 seconds, 1 second, 3 seconds, 7 seconds, 15 seconds, etc

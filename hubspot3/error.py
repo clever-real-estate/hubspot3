@@ -3,7 +3,7 @@ hubspot3 error helpers
 """
 import json
 
-from hubspot3.utils import force_utf8
+from hubspot3.utils import force_utf8, uglify_hapikey
 
 
 class EmptyResult:
@@ -17,9 +17,6 @@ class EmptyResult:
         self.body = ""
         self.msg = ""
         self.reason = ""
-
-    def __bool__(self):
-        return False
 
 
 class HubspotError(ValueError):
@@ -57,9 +54,6 @@ class HubspotError(ValueError):
         """tests if the given item text is in the error text"""
         return item in self.__str__()
 
-    def __bool__(self):
-        return False
-
     def __init__(self, result, request, err=None):
         super(HubspotError, self).__init__(result and result.reason or "Unknown Reason")
         if result is None:
@@ -68,8 +62,13 @@ class HubspotError(ValueError):
             self.result = result
         if request is None:
             request = {}
+        if "url" in request:
+            request["url"] = uglify_hapikey(request["url"])
         self.request = request
         self.err = err
+
+    def __reduce__(self):
+        return (self.__class__, (self.result, self.request))
 
     def __str__(self):
         params = {}
@@ -86,7 +85,7 @@ class HubspotError(ValueError):
         for key in request_keys:
             params[key] = self.request.get(key)
         for attr in result_attrs:
-            params["result_{}".format(attr)] = getattr(self.result, attr, "")
+            params[f"result_{attr}"] = getattr(self.result, attr, "")
 
         params = self._dict_vals_to_str(params)
         return self.as_str_template.format(**params)

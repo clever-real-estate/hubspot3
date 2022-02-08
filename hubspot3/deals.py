@@ -28,16 +28,14 @@ class DealsClient(BaseClient):
 
     def _get_path(self, subpath):
         """get the full api url for the given subpath on this client"""
-        return "deals/v{}/{}".format(
-            self.options.get("version") or DEALS_API_VERSION, subpath
-        )
+        return f"deals/v{self.options.get('version') or DEALS_API_VERSION}/{subpath}"
 
     def get(self, deal_id: str, **options):
         """
         get a single deal by id
         :see: https://developers.hubspot.com/docs/methods/deals/get_deal
         """
-        return self._call("deal/{}".format(deal_id), method="GET", **options)
+        return self._call(f"deal/{deal_id}", method="GET", **options)
 
     def create(self, data: dict = None, **options):
         """
@@ -53,14 +51,14 @@ class DealsClient(BaseClient):
         :see: https://developers.hubspot.com/docs/methods/deals/update_deal
         """
         data = data or {}
-        return self._call("deal/{}".format(deal_id), data=data, method="PUT", **options)
+        return self._call(f"deal/{deal_id}", data=data, method="PUT", **options)
 
     def delete(self, deal_id: str, **options) -> Dict:
         """
         Delete a deal.
         :see: https://developers.hubspot.com/docs/methods/deals/delete_deal
         """
-        return self._call("deal/{}".format(deal_id), method="DELETE", **options)
+        return self._call(f"deal/{deal_id}", method="DELETE", **options)
 
     def associate(self, deal_id, object_type, object_ids, **options):
         # TODO: DEPRECATE
@@ -71,10 +69,10 @@ class DealsClient(BaseClient):
         query = urllib.parse.urlencode(object_ids)
 
         return self._call(
-            "deal/{}/associations/{}".format(deal_id, object_type),
+            f"deal/{deal_id}/associations/{object_type}",
             method="PUT",
             query=query,
-            **options
+            **options,
         )
 
     def get_all(
@@ -82,7 +80,7 @@ class DealsClient(BaseClient):
         offset: int = 0,
         extra_properties: Union[list, str] = None,
         limit: int = -1,
-        **options
+        **options,
     ):
         """
         get all deals in the hubspot account.
@@ -128,7 +126,7 @@ class DealsClient(BaseClient):
                     "includeAssociations": True,
                 },
                 doseq=True,
-                **options
+                **options,
             )
             output.extend(
                 [
@@ -149,7 +147,7 @@ class DealsClient(BaseClient):
         offset: int = 0,
         since: int = None,
         include_versions: bool = False,
-        **options
+        **options,
     ):
         """
         returns a list of either recently created or recently modified deals
@@ -172,11 +170,11 @@ class DealsClient(BaseClient):
             if since:
                 params["since"] = since
             batch = self._call(
-                "deal/recent/{}".format(recency_type),
+                f"deal/recent/{recency_type}",
                 method="GET",
                 params=params,
                 doseq=True,
-                **options
+                **options,
             )
             output.extend(
                 [
@@ -196,7 +194,7 @@ class DealsClient(BaseClient):
         offset: int = 0,
         since: int = None,
         include_versions: bool = False,
-        **options
+        **options,
     ):
         """
         get recently created deals
@@ -210,7 +208,7 @@ class DealsClient(BaseClient):
             offset=offset,
             since=since,
             include_versions=include_versions,
-            **options
+            **options,
         )
 
     def get_recently_modified(
@@ -219,7 +217,7 @@ class DealsClient(BaseClient):
         offset: int = 0,
         since: int = None,
         include_versions: bool = False,
-        **options
+        **options,
     ):
         """
         get recently modified deals
@@ -233,6 +231,6 @@ class DealsClient(BaseClient):
             offset=offset,
             since=since,
             include_versions=include_versions,
-            **options
+            **options,
         )
 

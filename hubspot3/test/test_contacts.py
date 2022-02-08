@@ -31,7 +31,7 @@ class TestContactsClient(object):
         resp = contacts_client.create_or_update_by_email(email, data)
         mock_connection.assert_num_requests(1)
         mock_connection.assert_has_request(
-            "POST", "/contacts/v1/contact/createOrUpdate/email/{}?".format(email), data
+            "POST", f"/contacts/v1/contact/createOrUpdate/email/{email}?", data
         )
         assert resp == response_body
 
@@ -51,7 +51,7 @@ class TestContactsClient(object):
         resp = contacts_client.get_by_email(email)
         mock_connection.assert_num_requests(1)
         mock_connection.assert_has_request(
-            "GET", "/contacts/v1/contact/email/{}/profile?".format(email)
+            "GET", f"/contacts/v1/contact/email/{email}/profile?"
         )
         assert resp == response_body
 
@@ -71,7 +71,7 @@ class TestContactsClient(object):
         resp = contacts_client.get_by_id(vid)
         mock_connection.assert_num_requests(1)
         mock_connection.assert_has_request(
-            "GET", "/contacts/v1/contact/vid/{}/profile?".format(vid)
+            "GET", f"/contacts/v1/contact/vid/{vid}/profile?"
         )
         assert resp == response_body
 
@@ -83,7 +83,7 @@ class TestContactsClient(object):
         resp = contacts_client.update_by_id(contact_id, data)
         mock_connection.assert_num_requests(1)
         mock_connection.assert_has_request(
-            "POST", "/contacts/v1/contact/vid/{}/profile?".format(contact_id), data
+            "POST", f"/contacts/v1/contact/vid/{contact_id}/profile?", data
         )
         assert resp == response_body
 
@@ -94,7 +94,7 @@ class TestContactsClient(object):
         resp = contacts_client.delete_by_id(contact_id)
         mock_connection.assert_num_requests(1)
         mock_connection.assert_has_request(
-            "DELETE", "/contacts/v1/contact/vid/{}?".format(contact_id)
+            "DELETE", f"/contacts/v1/contact/vid/{contact_id}?"
         )
         assert resp == response_body
 
@@ -134,7 +134,7 @@ class TestContactsClient(object):
         resp = contacts_client.update_by_email(email, data)
         mock_connection.assert_num_requests(1)
         mock_connection.assert_has_request(
-            "POST", "/contacts/v1/contact/email/{}/profile?".format(email), data
+            "POST", f"/contacts/v1/contact/email/{email}/profile?", data
         )
         assert resp == response_body
 
@@ -145,7 +145,7 @@ class TestContactsClient(object):
         mock_connection.assert_num_requests(1)
         mock_connection.assert_has_request(
             "POST",
-            "/contacts/v1/contact/merge-vids/{}/?".format(primary_id),
+            f"/contacts/v1/contact/merge-vids/{primary_id}/?",
             dict(vidToMerge=secondary_id),
         )
         assert resp is None
@@ -191,6 +191,29 @@ class TestContactsClient(object):
             [contact["vid"] for contact in response_body["contacts"]],
             extra_properties=extra_properties,
         )
+
+    def test_get_in_list(self, contacts_client, mock_connection):
+        list_id = 15
+        response_body = {
+            "contacts": [
+                {
+                    "addedAt": 1390574181854,
+                    "vid": 204727,
+                    "canonical-vid": 204727,
+                    "merged-vids": [],
+                    "properties": {},
+                }
+            ],
+            "has-more": False,
+            "vid-offset": 204727,
+        }
+        mock_connection.set_response(200, json.dumps(response_body))
+        resp = contacts_client.get_in_list(list_id=list_id)
+        mock_connection.assert_num_requests(1)
+        mock_connection.assert_has_request(
+            "GET", f"/contacts/v1/lists/{list_id}/contacts/all", count=100
+        )
+        assert resp == response_body["contacts"]
 
     @pytest.mark.parametrize(
         "extra_properties_given, extra_properties_as_list",
@@ -267,9 +290,6 @@ class TestContactsClient(object):
                 assert len(warning_instance) == 1
                 assert issubclass(warning_instance[-1].category, DeprecationWarning)
                 message = str(warning_instance[-1].message)
-                assert (
-                    "{old_name} is deprecated".format(old_name=deprecated_name)
-                    in message
-                )
+                assert f"{deprecated_name} is deprecated" in message
                 new_name_part = message.find("favor of")
                 assert new_name in message[new_name_part:]

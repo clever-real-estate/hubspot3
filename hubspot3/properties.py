@@ -41,20 +41,22 @@ class PropertiesClient(BaseClient):
         self.log = get_log("hubspot3.properties")
 
     def _get_path(self, subpath):
-        return "properties/v{}/{}/properties/{}".format(
-            PROPERTIES_API_VERSION[self._object_type], self._object_type, subpath
+        return (
+            f"properties/v{PROPERTIES_API_VERSION[self._object_type]}"
+            f"/{self._object_type}/properties/{subpath}"
         )
 
     @staticmethod
     def _validate(
-        data_type: Optional[str], widget_type: Optional[str], extra_params: dict
+        data_type: Optional[str],
+        widget_type: Optional[str],
+        extra_params: Optional[Dict],
     ) -> None:
         if data_type:
             if data_type not in VALID_PROPERTY_DATA_TYPES:
                 raise ValueError(
-                    "Invalid data type for property. Valid data types are: {}".format(
-                        VALID_PROPERTY_DATA_TYPES
-                    )
+                    "Invalid data type for property. Valid data "
+                    f"types are: {VALID_PROPERTY_DATA_TYPES}"
                 )
 
             if data_type == DATA_TYPE_ENUM and (
@@ -67,8 +69,9 @@ class PropertiesClient(BaseClient):
 
         if widget_type and widget_type not in VALID_PROPERTY_WIDGET_TYPES:
             raise ValueError(
-                "Invalid widget type for property. Valid widget types are: {}".format(
-                    VALID_PROPERTY_WIDGET_TYPES
+                (
+                    "Invalid widget type for property. Valid widget "
+                    f"types are: {VALID_PROPERTY_WIDGET_TYPES}"
                 )
             )
 
@@ -81,7 +84,7 @@ class PropertiesClient(BaseClient):
         group_code: str,
         data_type: str,
         widget_type: str,
-        extra_params: dict = None,
+        extra_params: Optional[Dict] = None,
     ) -> Dict:
         """
         Create a new custom property on hubspot.
@@ -116,7 +119,7 @@ class PropertiesClient(BaseClient):
         group_code: str = None,
         data_type: str = None,
         widget_type: str = None,
-        extra_params: dict = None,
+        extra_params: Optional[Dict] = None,
     ) -> Dict:
         """
         Update a custom property on hubspot.
@@ -139,7 +142,7 @@ class PropertiesClient(BaseClient):
         }
         data = {key: value for key, value in fields.items() if value is not None}
 
-        return self._call("named/{}".format(code), method="PUT", data=data)
+        return self._call(f"named/{code}", method="PUT", data=data)
 
     def get_all(self, object_type):
         """Retrieve all the custom properties."""
@@ -151,13 +154,21 @@ class PropertiesClient(BaseClient):
             "", method="GET", params={"properties": ["name", "label", "description"]}
         )
 
+    def get(self, object_type: str, code: str):
+        """Retrieve a property."""
+
+        # Save the current object type.
+        self._object_type = object_type
+
+        return self._call(f"named/{code}", method="GET")
+
     def delete(self, object_type, code):
         """Delete a custom property."""
 
         # Save the current object type.
         self._object_type = object_type
 
-        return self._call("named/{}".format(code), method="DELETE")
+        return self._call(f"named/{code}", method="DELETE")
 
     def delete_all(self, object_type):
         """Delete all the custom properties. Please use it carefully."""
