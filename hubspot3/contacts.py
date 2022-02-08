@@ -1,14 +1,13 @@
 """
 hubspot contacts api
 """
-import warnings
 import urllib.parse
-from typing import Union
-from hubspot3.crm_associations import CRMAssociationsClient
-from hubspot3.base import BaseClient
-from hubspot3.utils import prettify, get_log
-from typing import Dict, List
+import warnings
+from typing import Dict, List, Union
 
+from hubspot3.base import BaseClient
+from hubspot3.crm_associations import CRMAssociationsClient
+from hubspot3.utils import get_log, prettify
 
 CONTACTS_API_VERSION = "1"
 
@@ -44,9 +43,7 @@ class ContactsClient(BaseClient):
 
     def get_by_hutk(self, hutk, **options):
         """Get contact specified by hutk."""
-        return self._call(
-            "contact/utk/{hutk}/profile".format(hutk=hutk), method="GET", **options
-        )
+        return self._call(f"contact/utk/{hutk}/profile", method="GET", **options)
 
     def create(self, data: Dict = None, **options):
         """create a contact"""
@@ -63,17 +60,13 @@ class ContactsClient(BaseClient):
     def update_by_id(self, contact_id: str, data: Dict = None, **options):
         """Update the contact by contact_id with the given data."""
         data = data or {}
-        return self._call(
-            f"contact/vid/{contact_id}/profile", data=data, method="POST", **options
-        )
+        return self._call(f"contact/vid/{contact_id}/profile", data=data, method="POST", **options)
 
     def update_by_email(self, email: str, data=None, **options):
         """update the concat for the given email address with the given data"""
         data = data or {}
 
-        return self._call(
-            f"contact/email/{email}/profile", data=data, method="POST", **options
-        )
+        return self._call(f"contact/email/{email}/profile", data=data, method="POST", **options)
 
     def delete_by_id(self, contact_id: str, **options):
         """Delete a contact by contact_id."""
@@ -83,9 +76,7 @@ class ContactsClient(BaseClient):
         """merge the data from the secondary_id into the data of the primary_id"""
         data = dict(vidToMerge=secondary_id)
 
-        self._call(
-            f"contact/merge-vids/{primary_id}/", data=data, method="POST", **options
-        )
+        self._call(f"contact/merge-vids/{primary_id}/", data=data, method="POST", **options)
 
     def search_for_contacts(self, query: str, **options):
         """
@@ -190,9 +181,7 @@ class ContactsClient(BaseClient):
         output = []
         query_limit = 100  # max according to the docs
         recency_string = (
-            "all"
-            if recency_type == ContactsClient.Recency.CREATED
-            else "recently_updated"
+            "all" if recency_type == ContactsClient.Recency.CREATED else "recently_updated"
         )
         limited = limit > 0
         if limited and limit < query_limit:
@@ -294,8 +283,7 @@ class ContactsClient(BaseClient):
 
     def update(self, contact_id: str, data: Dict = None, **options):
         warnings.warn(
-            "ContactsClient.update is deprecated in favor of "
-            "ContactsClient.update_by_id",
+            "ContactsClient.update is deprecated in favor of " "ContactsClient.update_by_id",
             DeprecationWarning,
         )
         return self.update_by_id(contact_id, data, **options)
