@@ -2,8 +2,9 @@
 hubspot3 module
 """
 from datetime import datetime, timedelta
-from hubspot3.error import HubspotBadConfig, HubspotNoConfig
 from typing import Any
+
+from hubspot3.error import HubspotBadConfig, HubspotNoConfig
 
 
 class Hubspot3UsageLimits:
@@ -132,6 +133,13 @@ class Hubspot3:
         from hubspot3.base import BaseClient
 
         return BaseClient(**self.auth, **self.options)
+
+    @property
+    def connections(self):
+        """returns a hubspot3 connections client"""
+        from hubspot3.connections import ConnectionsClient
+
+        return ConnectionsClient(**self.auth, **self.options)
 
     @property
     def blog(self):

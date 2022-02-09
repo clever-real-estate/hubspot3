@@ -233,4 +233,3 @@ class DealsClient(BaseClient):
             include_versions=include_versions,
             **options,
         )
-

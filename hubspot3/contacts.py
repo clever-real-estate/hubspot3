@@ -1,14 +1,13 @@
 """
 hubspot contacts api
 """
-import warnings
 import urllib.parse
-from typing import Union
-from hubspot3.crm_associations import CRMAssociationsClient
-from hubspot3.base import BaseClient
-from hubspot3.utils import prettify, get_log
-from typing import Dict, List
+import warnings
+from typing import Dict, List, Union
 
+from hubspot3.base import BaseClient
+from hubspot3.crm_associations import CRMAssociationsClient
+from hubspot3.utils import get_log, prettify
 
 CONTACTS_API_VERSION = "1"
 
@@ -44,9 +43,7 @@ class ContactsClient(BaseClient):
 
     def get_by_hutk(self, hutk, **options):
         """Get contact specified by hutk."""
-        return self._call(
-            "contact/utk/{hutk}/profile".format(hutk=hutk), method="GET", **options
-        )
+        return self._call(f"contact/utk/{hutk}/profile", method="GET", **options)
 
     def create(self, data: Dict = None, **options):
         """create a contact"""
@@ -89,7 +86,8 @@ class ContactsClient(BaseClient):
 
     def search_for_contacts(self, query: str, **options):
         """
-        Implementation of this HubSpot API endpoint: https://developers.hubspot.com/docs/methods/contacts/search_contacts
+        Implementation of this HubSpot API endpoint:
+        https://developers.hubspot.com/docs/methods/contacts/search_contacts
         Returns an array of HubSpot Contact JSON Objects or an empty array.
         """
         output = []

@@ -1,10 +1,11 @@
 """
 hubspot properties api
 """
-import urllib.parse
-from typing import Dict, Optional, Union
+from typing import Dict, Optional
+
 from hubspot3.base import BaseClient
 from hubspot3.globals import (
+    DATA_TYPE_ENUM,
     OBJECT_TYPE_COMPANIES,
     OBJECT_TYPE_CONTACTS,
     OBJECT_TYPE_DEALS,
@@ -12,10 +13,8 @@ from hubspot3.globals import (
     OBJECT_TYPE_PRODUCTS,
     VALID_PROPERTY_DATA_TYPES,
     VALID_PROPERTY_WIDGET_TYPES,
-    DATA_TYPE_ENUM,
 )
-from hubspot3.utils import prettify, get_log
-
+from hubspot3.utils import get_log
 
 PROPERTIES_API_VERSION = {
     OBJECT_TYPE_COMPANIES: "1",
